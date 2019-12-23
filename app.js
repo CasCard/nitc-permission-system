@@ -14,23 +14,53 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/permission-requests",{
-  userNewUrlParser:true
+mongoose.connect("mongodb://localhost:27017/wikiDB",{
+  useUnifiedTopology: true,useNewUrlParser: true
 });
 
-const permissionSchema={
-  rollno:String,
-  purpose:String,
-  permitters:[
-    {
-      facultyName:String,
-      securityName:String
-    }
-  ],
-  description:String,
-  duration:String
+const articleSchema={
+  title:String,
+  content:String
 };
-const Permission=mongoose.model("Permission",permissionSchema);
+const Article=mongoose.model("Article",articleSchema);
+//Get route
+app.get("/articles",function(req,res){
+  Article.find(function(err,foundArticles){
+    if(!err){
+      res.send(foundArticles);
+}else{
+      res.send(err);
+}
+
+  });
+});
+
+app.post("/articles",function(req,res){
+
+  const newArticle=new Article({
+    title:req.body.title,
+    content:req.body.content
+  });
+  newArticle.save(function(err){
+    if(!err){
+      res.send("Succesfully added");
+    }else{
+      res.send(err);
+    }
+  });
+});
+
+app.delete("/articles",function(req,res){
+  Article.deleteMany(function(err){
+    if(!err){
+      res.send("Successfully deleted all articles");
+    }else{
+      res.send(err);
+    }
+  });
+});
+
+
 
 app.listen(3000, function() {
   console.log("Server started on port 3000");
