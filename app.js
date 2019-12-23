@@ -24,40 +24,91 @@ const articleSchema={
 };
 const Article=mongoose.model("Article",articleSchema);
 //Get route
-app.get("/articles",function(req,res){
-  Article.find(function(err,foundArticles){
-    if(!err){
-      res.send(foundArticles);
-}else{
-      res.send(err);
-}
 
-  });
-});
+app.route("/articles")
+.get(
+  function(req,res){
+    Article.find(function(err,foundArticles){
+      if(!err){
+        res.send(foundArticles);
+  }else{
+        res.send(err);
+  }
 
-app.post("/articles",function(req,res){
+    });
+  }
+)
+.post(
+  function(req,res){
 
-  const newArticle=new Article({
-    title:req.body.title,
-    content:req.body.content
-  });
-  newArticle.save(function(err){
-    if(!err){
-      res.send("Succesfully added");
+    const newArticle=new Article({
+      title:req.body.title,
+      content:req.body.content
+    });
+    newArticle.save(function(err){
+      if(!err){
+        res.send("Succesfully added");
+      }else{
+        res.send(err);
+      }
+    });
+  }
+)
+.delete(
+  function(req,res){
+    Article.deleteMany(function(err){
+      if(!err){
+        res.send("Successfully deleted all articles");
+      }else{
+        res.send(err);
+      }
+    });
+  }
+);
+
+app.route("/articles/:articleTitle")
+.get(function(req,res){
+  Article.findOne({title:req.params.articleTitle},function(err,foundArticle){
+    if(foundArticle){
+      res.send(foundArticle);
     }else{
-      res.send(err);
+      res.send("No article found");
     }
   });
-});
-
-app.delete("/articles",function(req,res){
-  Article.deleteMany(function(err){
-    if(!err){
-      res.send("Successfully deleted all articles");
-    }else{
-      res.send(err);
+})
+.put(function(req,res){
+  Article.update(
+    {title:req.params.articleTitle},
+    {title:req.body.title,content:req.body.content},
+    {overwrite:true},
+    function(err){
+      if(!err){
+        res.send("Successfully updated articles");
+      }
     }
+  );
+})
+.patch(function(req,res){
+  Article.update(
+    {title:req.params.articleTitle},
+    {$set:req.body},
+    function(err){
+      if(!err){
+        res.send("Succcessfully updated article");
+      }else{
+        res.send(err);
+      }
+    }
+
+  );
+})
+.delete(
+  function(req,res){
+  Article.deleteOne({title:req.params.articleTitle},function(err){
+    if(err) console.log(err);
+  res.send("Successful deletion");
   });
+
 });
 
 
