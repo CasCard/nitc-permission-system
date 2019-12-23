@@ -18,34 +18,42 @@ mongoose.connect("mongodb://localhost:27017/wikiDB",{
   useUnifiedTopology: true,useNewUrlParser: true
 });
 
-const articleSchema={
-  title:String,
-  content:String
+const requestSchema={
+  from:String,
+  rollno:String,
+  date:Date,
+  to:[String],
+  description:String,
+  duration:String,
+  current_status:[String]
 };
-const Article=mongoose.model("Article",articleSchema);
+const Request=mongoose.model("Request",requestSchema);
 //Get route
 
-app.route("/articles")
+app.route("/requests")
 .get(
   function(req,res){
-    Article.find(function(err,foundArticles){
+    Request.find(function(err,foundPermissions){
       if(!err){
-        res.send(foundArticles);
+        res.send(foundPermissions);
   }else{
         res.send(err);
   }
-
     });
   }
 )
 .post(
   function(req,res){
-
-    const newArticle=new Article({
-      title:req.body.title,
-      content:req.body.content
+    const newRequest=new Request({
+      from:req.body.from,
+      rollno:req.body.rollno,
+      date:Date.now(),
+      to:req.body.to,
+      description:req.body.description,
+      duration:req.body.duration,
+      current_status:"Not yet confirmed"
     });
-    newArticle.save(function(err){
+    newRequest.save(function(err){
       if(!err){
         res.send("Succesfully added");
       }else{
@@ -56,9 +64,9 @@ app.route("/articles")
 )
 .delete(
   function(req,res){
-    Article.deleteMany(function(err){
+    Request.deleteMany(function(err){
       if(!err){
-        res.send("Successfully deleted all articles");
+        res.send("Successfully deleted all Requests");
       }else{
         res.send(err);
       }
@@ -66,35 +74,43 @@ app.route("/articles")
   }
 );
 
-app.route("/articles/:articleTitle")
+app.route("/requests/:rollno")
 .get(function(req,res){
-  Article.findOne({title:req.params.articleTitle},function(err,foundArticle){
-    if(foundArticle){
-      res.send(foundArticle);
+  Request.findOne({rollno:req.params.rollno},function(err,foundRequest){
+    if(foundRequest){
+      res.send(foundRequest);
     }else{
-      res.send("No article found");
+      res.send("No requests found");
     }
   });
 })
 .put(function(req,res){
-  Article.update(
-    {title:req.params.articleTitle},
-    {title:req.body.title,content:req.body.content},
+  Request.update(
+    {rollno:req.params.rollno},
+    {
+      from:req.body.from,
+      rollno:req.body.rollno,
+      date:Date.now(),
+      to:req.body.to,
+      description:req.body.description,
+      duration:req.body.duration,
+      current_status:"Confirmed"
+    },
     {overwrite:true},
     function(err){
       if(!err){
-        res.send("Successfully updated articles");
+        res.send("Successfully updated requests");
       }
     }
   );
 })
 .patch(function(req,res){
-  Article.update(
-    {title:req.params.articleTitle},
+  Request.update(
+    {rollno:req.params.rollno},
     {$set:req.body},
     function(err){
       if(!err){
-        res.send("Succcessfully updated article");
+        res.send("Succcessfully updated requests");
       }else{
         res.send(err);
       }
@@ -104,7 +120,7 @@ app.route("/articles/:articleTitle")
 })
 .delete(
   function(req,res){
-  Article.deleteOne({title:req.params.articleTitle},function(err){
+  Request.deleteOne({rollno:req.params.rollno},function(err){
     if(err) console.log(err);
   res.send("Successful deletion");
   });
