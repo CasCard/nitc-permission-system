@@ -28,6 +28,10 @@ const requestSchema={
   current_status:[String]
 };
 const Request=mongoose.model("Request",requestSchema);
+
+app.get("/",function(req,res){
+  res.render("login");
+});
 //Get route
 
 app.route("/requests")

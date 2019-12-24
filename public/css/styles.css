@@ -1,0 +1,22 @@
+nav {
+    background: #2297e0;
+    color: white;
+    padding: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1em;
+}
+
+nav h1 {
+    margin: 0;
+}
+
+nav img {
+    height: 45px;
+    width: 45px;
+    margin-right: 0.5em;
+}
+img {
+    border: 0;
+}
