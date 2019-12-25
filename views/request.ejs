@@ -229,24 +229,35 @@
         <p>Include a letter of support from advisor in application packet.<span class="required">*</span></p>
         <textarea rows="3" name="description" required></textarea>
       </div>
-      <div class="question">
-        <p>To be verified from:<span class="required">*</span></p>
-        <small>Please include the following in your application.</small>
-        <div class="question-answer checkbox-item">
-          <div>
-            <input type="checkbox" value="none" id="check_1" name="to[0]" required/>
-            <label for="check_1" class="check"><span>SAC</span></label>
-          </div>
-          <div>
-            <input type="checkbox" value="none" id="check_2" name="to[1]" required/>
-            <label for="check_2" class="check"><span>Security</span></label>
-          </div>
-          </div>
-      </div>
+      <input type="text" name="part[0]">
+      <div id="participant"></div>
+        <br>
+        <button type="button" onclick="addParticipant()">Add</button>
+        <button type="button" onclick="delParticipant()">Remove</button>
+
+
+        <br><br>
         <div class="btn-block">
-          <button type="submit">Submit Request</button>
+          <button type="submit" href="/success">Submit Request</button>
         </div>
     </form>
     </div>
+    <script type="text/javascript">
+    var cont = 1;
+        function addParticipant() {
+                var div = document.createElement('div');
+                div.className = 'participant';
+                div.innerHTML = '<input type="text" name="part['+cont+']">';
+
+                document.getElementById('participant').appendChild(div);
+                cont++
+        }
+
+        function delParticipant() {
+                var select = document.getElementById('participant');
+                document.getElementById('participant').removeChild(select.lastChild);
+                cont--
+        }
+    </script>
   </body>
 </html>

@@ -30,7 +30,8 @@ app.use(passport.session());
 
 
 mongoose.connect("mongodb://localhost:27017/wikiDB",{
-  useUnifiedTopology: true,useNewUrlParser: true
+  useUnifiedTopology: true,useNewUrlParser: true,
+  autoIndex:false
 });
 mongoose.set("useCreateIndex", true);
 
@@ -46,15 +47,16 @@ const requestSchema={
   current_status:[String]
 };
 const userSchema = new mongoose.Schema ({
-  googleId: String,
+  googleId: {type:String,index:{unique:true}},
   displayName: String
-});
+},{autoIndex:false});
 
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 
 const User = new mongoose.model("User", userSchema);
 const Request=mongoose.model("Request",requestSchema);
+
 
 passport.use(User.createStrategy());
 passport.serializeUser(function(user, done) {
@@ -75,7 +77,7 @@ passport.use(new GoogleStrategy({
   },
   function(accessToken, refreshToken, profile, cb) {
   console.log(profile);
-    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+    User.findOrCreate({ googleId: profile.id ,displayName:profile.displayName}, function (err, user) {
       return cb(err, user);
     });
   }
@@ -121,7 +123,7 @@ app.route("/requests")
       from:req.body.from,
       rollno:req.body.rollno,
       date:req.body.date,
-      to:req.body.to,
+      to:req.body.part,
       email:req.body.email,
       description:req.body.description,
       duration:req.body.duration,
@@ -129,8 +131,7 @@ app.route("/requests")
     });
     newRequest.save(function(err){
       if(!err){
-        res.send("Succesfully added");
-        res.render("success");
+        res.redirect("/success");
       }else{
         res.send(err);
       }
@@ -200,6 +201,9 @@ app.route("/requests/:rollno")
   res.send("Successful deletion");
   });
 
+});
+app.get("/success",function(req,res){
+  res.render("success");
 });
 
 app.get("/logout", function(req, res){
