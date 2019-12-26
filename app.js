@@ -48,7 +48,8 @@ const requestSchema={
 };
 const userSchema = new mongoose.Schema ({
   googleId: {type:String,index:{unique:true}},
-  displayName: String
+  displayName: String,
+  email:String
 },{autoIndex:false});
 
 userSchema.plugin(passportLocalMongoose);
@@ -72,12 +73,12 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/google/request",
+    callbackURL: "http://localhost:3000/auth/google/dashboard",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
   },
   function(accessToken, refreshToken, profile, cb) {
   console.log(profile);
-    User.findOrCreate({ googleId: profile.id ,displayName:profile.displayName}, function (err, user) {
+    User.findOrCreate({ googleId: profile.id ,displayName:profile.displayName,email:profile.emails[0].value}, function (err, user) {
       return cb(err, user);
     });
   }
@@ -88,20 +89,24 @@ app.get("/",function(req,res){
 });
 
 app.get("/auth/google",
-  passport.authenticate('google', { scope: ["profile"] })
+  passport.authenticate('google', { scope: ["profile","email"] })
 );
 
-app.get("/auth/google/request",
+app.get("/auth/google/dashboard",
   passport.authenticate('google', { failureRedirect: "/login" }),
   function(req, res) {
     // Successful authentication, redirect to secrets.
-    res.redirect("/request");
+    res.redirect("/dashboard");
 });
+
+app.get("/dashboard",function(req,res){
+  res.render("dashboard");
+});
+
 
 app.get("/request",function(req,res){
   res.render("request");
 });
-
 //Get route
 
 app.route("/requests")
