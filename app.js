@@ -77,10 +77,13 @@ passport.use(new GoogleStrategy({
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
   },
   function(accessToken, refreshToken, profile, cb) {
-  console.log(profile);
-    User.findOrCreate({ googleId: profile.id ,displayName:profile.displayName,email:profile.emails[0].value}, function (err, user) {
-      return cb(err, user);
-    });
+    if(profile._json.hd === "nitc.ac.in"){
+      User.findOrCreate({ googleId: profile.id ,displayName:profile.displayName,email:profile.emails[0].value}, function (err, user) {
+        return cb(err, user);
+      });
+    }else{
+      cb(process.on('uncaughtException',(err,origin)=>{}));
+    }
   }
 ));
 
@@ -92,10 +95,10 @@ app.get("/auth/google",
   passport.authenticate('google', { scope: ["profile","email"] })
 );
 
+
 app.get("/auth/google/dashboard",
-  passport.authenticate('google', { failureRedirect: "/login" }),
+  passport.authenticate('google', { failureRedirect: "/login"}),
   function(req, res) {
-    // Successful authentication, redirect to secrets.
     res.redirect("/dashboard");
 });
 
