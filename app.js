@@ -29,34 +29,42 @@ app.use(passport.session());
 
 
 
-mongoose.connect("mongodb://localhost:27017/wikiDB",{
-  useUnifiedTopology: true,useNewUrlParser: true,
-  autoIndex:false
+mongoose.connect("mongodb://localhost:27017/wikiDB", {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+  autoIndex: false
 });
 mongoose.set("useCreateIndex", true);
 
-const requestSchema={
-  from:String,
-  rollno:String,
-  date:Date,
-  purpose:String,
-  to:[String],
-  email:String,
-  description:String,
-  duration:String,
-  current_status:[String]
+const requestSchema = {
+  from: String,
+  rollno: String,
+  date: Date,
+  purpose: String,
+  to: [String],
+  email: String,
+  description: String,
+  duration: String,
+  current_status: [String]
 };
-const userSchema = new mongoose.Schema ({
-  googleId: {type:String,index:{unique:true}},
+const userSchema = new mongoose.Schema({
+  googleId: {
+    type: String,
+    index: {
+      unique: true
+    }
+  },
   displayName: String,
-  email:String
-},{autoIndex:false});
+  email: String
+}, {
+  autoIndex: false
+});
 
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 
 const User = new mongoose.model("User", userSchema);
-const Request=mongoose.model("Request",requestSchema);
+const Request = mongoose.model("Request", requestSchema);
 
 
 passport.use(User.createStrategy());
@@ -70,151 +78,173 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
+
 passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
     callbackURL: "http://localhost:3000/auth/google/dashboard",
-    userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
+    userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+    hd: 'nitc.ac.in'
   },
   function(accessToken, refreshToken, profile, cb) {
-    if(profile._json.hd === "nitc.ac.in"){
-      User.findOrCreate({ googleId: profile.id ,displayName:profile.displayName,email:profile.emails[0].value}, function (err, user) {
+    if (profile._json.hd === "nitc.ac.in") {
+      User.findOrCreate({
+        googleId: profile.id,
+        displayName: profile.displayName,
+        email: profile.emails[0].value
+      }, function(err, user) {
         return cb(err, user);
       });
-    }else{
-      cb(process.on('uncaughtException',(err,origin)=>{}));
     }
   }
 ));
 
-app.get("/",function(req,res){
+
+app.get("/", function(req, res) {
   res.render("login");
 });
 
+
 app.get("/auth/google",
-  passport.authenticate('google', { scope: ["profile","email"] })
+  passport.authenticate('google', {
+    scope: ["profile", "email"],
+    hd: 'nitc.ac.in'
+  })
 );
 
 
 app.get("/auth/google/dashboard",
-  passport.authenticate('google', { failureRedirect: "/login"}),
+  passport.authenticate('google', {
+    failureRedirect: "/login"
+  }),
   function(req, res) {
     res.redirect("/dashboard");
+  });
+
+app.get("/login_failed", function(req, res) {
+  res.render("login_failed");
 });
 
-app.get("/dashboard",function(req,res){
+app.get("/dashboard", function(req, res) {
   res.render("dashboard");
 });
 
 
-app.get("/request",function(req,res){
+app.get("/request", function(req, res) {
   res.render("request");
 });
 //Get route
 
 app.route("/requests")
-.get(
-  function(req,res){
-    Request.find(function(err,foundPermissions){
-      if(!err){
-        res.send(foundPermissions);
-  }else{
-        res.send(err);
-  }
-    });
-  }
-)
-.post(
-  function(req,res){
-    const newRequest=new Request({
-      purpose:req.body.purpose,
-      from:req.body.from,
-      rollno:req.body.rollno,
-      date:req.body.date,
-      to:req.body.part,
-      email:req.body.email,
-      description:req.body.description,
-      duration:req.body.duration,
-      current_status:"Not yet confirmed"
-    });
-    newRequest.save(function(err){
-      if(!err){
-        res.redirect("/success");
-      }else{
-        res.send(err);
-      }
-    });
-  }
-)
-.delete(
-  function(req,res){
-    Request.deleteMany(function(err){
-      if(!err){
-        res.send("Successfully deleted all Requests");
-      }else{
-        res.send(err);
-      }
-    });
-  }
-);
+  .get(
+    function(req, res) {
+      Request.find(function(err, foundPermissions) {
+        if (!err) {
+          res.send(foundPermissions);
+        } else {
+          res.send(err);
+        }
+      });
+    }
+  )
+  .post(
+    function(req, res) {
+      const newRequest = new Request({
+        purpose: req.body.purpose,
+        from: req.body.from,
+        rollno: req.body.rollno,
+        date: req.body.date,
+        to: req.body.part,
+        email: req.body.email,
+        description: req.body.description,
+        duration: req.body.duration,
+        current_status: "Not yet confirmed"
+      });
+      newRequest.save(function(err) {
+        if (!err) {
+          res.redirect("/success");
+        } else {
+          res.send(err);
+        }
+      });
+    }
+  )
+  .delete(
+    function(req, res) {
+      Request.deleteMany(function(err) {
+        if (!err) {
+          res.send("Successfully deleted all Requests");
+        } else {
+          res.send(err);
+        }
+      });
+    }
+  );
 
 app.route("/requests/:rollno")
-.get(function(req,res){
-  Request.findOne({rollno:req.params.rollno},function(err,foundRequest){
-    if(foundRequest){
-      res.send(foundRequest);
-    }else{
-      res.send("No requests found");
-    }
-  });
-})
-.put(function(req,res){
-  Request.update(
-    {rollno:req.params.rollno},
-    {
-      from:req.body.from,
-      rollno:req.body.rollno,
-      date:Date.now(),
-      to:req.body.to,
-      description:req.body.description,
-      duration:req.body.duration,
-      current_status:"Confirmed"
-    },
-    {overwrite:true},
-    function(err){
-      if(!err){
-        res.send("Successfully updated requests");
+  .get(function(req, res) {
+    Request.findOne({
+      rollno: req.params.rollno
+    }, function(err, foundRequest) {
+      if (foundRequest) {
+        res.send(foundRequest);
+      } else {
+        res.send("No requests found");
       }
-    }
-  );
-})
-.patch(function(req,res){
-  Request.update(
-    {rollno:req.params.rollno},
-    {$set:req.body},
-    function(err){
-      if(!err){
-        res.send("Succcessfully updated requests");
-      }else{
-        res.send(err);
+    });
+  })
+  .put(function(req, res) {
+    Request.update({
+        rollno: req.params.rollno
+      }, {
+        from: req.body.from,
+        rollno: req.body.rollno,
+        date: Date.now(),
+        to: req.body.to,
+        description: req.body.description,
+        duration: req.body.duration,
+        current_status: "Confirmed"
+      }, {
+        overwrite: true
+      },
+      function(err) {
+        if (!err) {
+          res.send("Successfully updated requests");
+        }
       }
-    }
+    );
+  })
+  .patch(function(req, res) {
+    Request.update({
+        rollno: req.params.rollno
+      }, {
+        $set: req.body
+      },
+      function(err) {
+        if (!err) {
+          res.send("Succcessfully updated requests");
+        } else {
+          res.send(err);
+        }
+      }
 
-  );
-})
-.delete(
-  function(req,res){
-  Request.deleteOne({rollno:req.params.rollno},function(err){
-    if(err) console.log(err);
-  res.send("Successful deletion");
-  });
+    );
+  })
+  .delete(
+    function(req, res) {
+      Request.deleteOne({
+        rollno: req.params.rollno
+      }, function(err) {
+        if (err) console.log(err);
+        res.send("Successful deletion");
+      });
 
-});
-app.get("/success",function(req,res){
+    });
+app.get("/success", function(req, res) {
   res.render("success");
 });
 
-app.get("/logout", function(req, res){
+app.get("/logout", function(req, res) {
   req.logout();
   console.log("Successfully logout");
   res.redirect("/");
