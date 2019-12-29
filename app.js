@@ -125,8 +125,10 @@ app.get("/login_failed", function(req, res) {
   res.render("login_failed");
 });
 
-app.get("/dashboard", function(req, res) {
-  res.render("dashboard");
+app.get("/dashboard", function(req, res){
+
+  console.log(req.user.displayName);
+  res.render("dashboard",{username:req.user.displayName});
 });
 
 
