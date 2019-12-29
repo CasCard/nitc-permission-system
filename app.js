@@ -10,6 +10,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const passport = require("passport");
 const findOrCreate = require('mongoose-findorcreate');
 const passportLocalMongoose = require("passport-local-mongoose");
+const request=require("request");
 const app = express();
 
 app.use(express.static("public"));
@@ -127,8 +128,14 @@ app.get("/login_failed", function(req, res) {
 
 app.get("/dashboard", function(req, res){
 
-  console.log(req.user.displayName);
-  res.render("dashboard",{username:req.user.displayName});
+  request("http://localhost:3000/requests/B190257EP",function(error,response,body){
+  var data=JSON.parse(body);
+    console.log(data);
+    res.render("dashboard",{username:req.user.displayName,posts:data});
+  });
+
+
+
 });
 
 
@@ -185,7 +192,7 @@ app.route("/requests")
 
 app.route("/requests/:rollno")
   .get(function(req, res) {
-    Request.findOne({
+    Request.find({
       rollno: req.params.rollno
     }, function(err, foundRequest) {
       if (foundRequest) {

@@ -1,3 +1,11 @@
 <%- include('partials/header') %>
 <a class="btn btn-dark btn-lg" href="/request" role="button">Create a request</a>
 <p>Welcome <%=username%></p>
+
+<h1>Your recent requests</h1>
+    <% for(let i = 0; i < posts.length; i++) { %>
+        <article>
+            <h2><%= posts[i].purpose %></h1>
+            <p><%= posts[i].date %></p>
+        </article>
+    <% } %>
