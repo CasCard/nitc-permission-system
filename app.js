@@ -81,8 +81,8 @@ passport.deserializeUser(function(id, done) {
 
 
 passport.use(new GoogleStrategy({
-    clientID:84949301235-mt5r7b78e4eeaq4e508cbol4gpo83t01.apps.googleusercontent.com,
-    clientSecret:wYSLEeMZ7GfJ7WLwPyCW2qiB,
+    clientID:process.env.CLIENT_ID,
+    clientSecret:process.env.CLIENT_SECRET,
     callbackURL: "/auth/google/dashboard",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     hd: 'nitc.ac.in'
