@@ -30,7 +30,7 @@ app.use(passport.session());
 
 
 
-mongoose.connect("mongodb+srv://abelcheruvathoor:abelcd@2001@cluster0-mwzit.mongodb.net/wikiDB?retryWrites=true&w=majority", {
+mongoose.connect("mongodb+srv://abelcheruvathoor:abelcd@2001@cluster0-mwzit.mongodb.net/wikiDB", {
   useUnifiedTopology: true,
   useNewUrlParser: true,
   autoIndex: false
@@ -128,7 +128,7 @@ app.get("/login_failed", function(req, res) {
 
 app.get("/dashboard", function(req, res){
 
-  request("http://localhost:3000/requests/B190257EP",function(error,response,body){
+  request("https://glacial-lake-64780.herokuapp.com/requests/B190257EP",function(error,response,body){
   var data=JSON.parse(body);
     console.log(data);
     res.render("dashboard",{username:req.user.displayName,posts:data});
@@ -136,7 +136,7 @@ app.get("/dashboard", function(req, res){
 });
 
 app.get("/verification", function(req, res) {
-  request("http://localhost:3000/requests",function(error,response,body){
+  request("https://glacial-lake-64780.herokuapp.com/requests",function(error,response,body){
   var data=JSON.parse(body);
     console.log(data);
     res.render("verification",{posts:data});
