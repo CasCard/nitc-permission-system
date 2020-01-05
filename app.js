@@ -30,7 +30,7 @@ app.use(passport.session());
 
 
 
-mongoose.connect("mongodb://localhost:27017/wikiDB", {
+mongoose.connect("mongodb+srv://abelcheruvathoor:abelcd@2001@cluster0-mwzit.mongodb.net/wikiDB?retryWrites=true&w=majority", {
   useUnifiedTopology: true,
   useNewUrlParser: true,
   autoIndex: false
@@ -83,7 +83,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/google/dashboard",
+    callbackURL: "/auth/google/dashboard",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     hd: 'nitc.ac.in'
   },
@@ -133,10 +133,17 @@ app.get("/dashboard", function(req, res){
     console.log(data);
     res.render("dashboard",{username:req.user.displayName,posts:data});
   });
-
-
-
 });
+
+app.get("/verification", function(req, res) {
+  request("http://localhost:3000/requests",function(error,response,body){
+  var data=JSON.parse(body);
+    console.log(data);
+    res.render("verification",{posts:data});
+  });
+});
+
+
 
 
 app.get("/request", function(req, res) {
@@ -167,7 +174,7 @@ app.route("/requests")
         email: req.body.email,
         description: req.body.description,
         duration: req.body.duration,
-        current_status: "Not yet confirmed"
+        current_status:req.body.status
       });
       newRequest.save(function(err) {
         if (!err) {
@@ -202,41 +209,19 @@ app.route("/requests/:rollno")
       }
     });
   })
-  .put(function(req, res) {
-    Request.update({
-        rollno: req.params.rollno
-      }, {
-        from: req.body.from,
-        rollno: req.body.rollno,
-        date: Date.now(),
-        to: req.body.to,
-        description: req.body.description,
-        duration: req.body.duration,
-        current_status: "Confirmed"
-      }, {
-        overwrite: true
-      },
-      function(err) {
-        if (!err) {
-          res.send("Successfully updated requests");
-        }
-      }
-    );
-  })
   .patch(function(req, res) {
     Request.update({
         rollno: req.params.rollno
       }, {
-        $set: req.body
+        $set:req.body
       },
       function(err) {
         if (!err) {
-          res.send("Succcessfully updated requests");
-        } else {
+          res.send("Successfully updated requests");
+        }else{
           res.send(err);
         }
       }
-
     );
   })
   .delete(
