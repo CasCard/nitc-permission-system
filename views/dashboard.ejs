@@ -7,5 +7,8 @@
         <article>
             <h2><%= posts[i].purpose %></h1>
             <p><%= posts[i].date %></p>
+            <% for(let j = 0; j < posts[i].to.length; j++) { %>
+            <p><%= posts[i].to[j] %></p>
+            <% } %>
         </article>
     <% } %>
