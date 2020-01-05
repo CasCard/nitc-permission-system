@@ -81,8 +81,8 @@ passport.deserializeUser(function(id, done) {
 
 
 passport.use(new GoogleStrategy({
-    clientID: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
+    clientID:84949301235-mt5r7b78e4eeaq4e508cbol4gpo83t01.apps.googleusercontent.com,
+    clientSecret:wYSLEeMZ7GfJ7WLwPyCW2qiB,
     callbackURL: "/auth/google/dashboard",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     hd: 'nitc.ac.in'
@@ -245,8 +245,8 @@ app.get("/logout", function(req, res) {
 });
 
 
-const PORT = process.env.PORT || 3000;
+let PORT = process.env.PORT;
 
 app.listen(PORT, function() {
-  console.log("Server started on port ${PORT}");
+  console.log("Server started on port successful");
 });
