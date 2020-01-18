@@ -9,14 +9,10 @@
     <% for(let j = 0; j < posts[i].to.length; j++) { %>
     <p><%= posts[i].to[j] %></p>
     <% } %>
-    <form action="/requests/B194057EP" method="PATCH">
-      <input type="text" name="status[0]">
-      <div id="participant"></div>
-      <br>
-      <button type="button" onclick="addParticipant()">Add</button>
-      <button type="button" onclick="delParticipant()">Remove</button>
+    <form action="/requests/B190257EP" method="post">
+      <input type="checkbox" name="status[0]">Confirm
       <div class="btn-block">
-        <button type="submit" href="/success">Submit Request</button>
+        <button type="submit" href="/success">Submit</button>
       </div>
     </form>
     <p><%= posts[i].email %></p>

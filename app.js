@@ -11,9 +11,18 @@ const passport = require("passport");
 const findOrCreate = require('mongoose-findorcreate');
 const passportLocalMongoose = require("passport-local-mongoose");
 const request=require("request");
+const multer = require('multer');
+const GridFsStorage = require('multer-gridfs-storage');
+const Grid = require('gridfs-stream');
+const methodOverride = require('method-override');
 const app = express();
 
+
+
+
 app.use(express.static("public"));
+app.use(methodOverride('_method'));
+
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({
   extended: true
@@ -29,6 +38,30 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
+
+const conn=mongoose.createConnection("mongodb+srv://abelcheruvathoor:abelcd@2001@cluster0-mwzit.mongodb.net/wikiDB");
+let gfs;
+
+conn.once('open',()=>{
+  gfs=Grid(conn.db,mongoose.mongo);
+  gfs.collection('uploads');
+});
+
+const storage=new GridFsStorage({
+  url:"mongodb+srv://abelcheruvathoor:abelcd@2001@cluster0-mwzit.mongodb.net/wikiDB",
+  file:(req,file)=>{
+    return new Promise((resolve,reject)=>{
+      const filename=file.originalname;
+      const fileInfo={
+        filename:filename,
+        bucketName:'uploads'
+      };
+      resolve(fileInfo);
+    });
+  }
+
+});
+const upload=multer({storage:storage});
 
 mongoose.connect("mongodb+srv://abelcheruvathoor:abelcd@2001@cluster0-mwzit.mongodb.net/wikiDB", {
   useUnifiedTopology: true,
@@ -79,11 +112,11 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
-
+ // "https://glacial-lake-64780.herokuapp.com/auth/google/dashboard"
 passport.use(new GoogleStrategy({
     clientID:process.env.CLIENT_ID,
     clientSecret:process.env.CLIENT_SECRET,
-    callbackURL: "https://glacial-lake-64780.herokuapp.com/auth/google/dashboard",
+    callbackURL:"http://localhost:3000/auth/google/dashboard",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     hd: 'nitc.ac.in'
   },
@@ -128,15 +161,21 @@ app.get("/login_failed", function(req, res) {
 
 app.get("/dashboard", function(req, res){
 
-  request("https://glacial-lake-64780.herokuapp.com/requests/B190257EP",function(error,response,body){
-  var data=JSON.parse(body);
-    console.log(data);
-    res.render("dashboard",{username:req.user.displayName,posts:data});
-  });
+// "https://glacial-lake-64780.herokuapp.com/requests/B190257EP"
+request("http://localhost:3000/requests/B190257EP",function(error,response,body){
+var data=JSON.parse(body);
+  console.log(data);
+  res.render("dashboard",{username:req.user.displayName,posts:data});
 });
 
+});
+// "https://glacial-lake-64780.herokuapp.com/requests"
+
+
+
+
 app.get("/verification", function(req, res) {
-  request("https://glacial-lake-64780.herokuapp.com/requests",function(error,response,body){
+  request("http://localhost:3000/requests",function(error,response,body){
   var data=JSON.parse(body);
     console.log(data);
     res.render("verification",{posts:data});
@@ -154,6 +193,7 @@ app.get("/request", function(req, res) {
 app.route("/requests")
   .get(
     function(req, res) {
+
       Request.find(function(err, foundPermissions) {
         if (!err) {
           res.send(foundPermissions);
@@ -163,7 +203,7 @@ app.route("/requests")
       });
     }
   )
-  .post(
+  .post(upload.single('file'),
     function(req, res) {
       const newRequest = new Request({
         purpose: req.body.purpose,
@@ -245,7 +285,7 @@ app.get("/logout", function(req, res) {
 });
 
 
-let PORT = process.env.PORT;
+let PORT = process.env.PORT || 3000;
 
 app.listen(PORT, function() {
   console.log("Server started on port successful");

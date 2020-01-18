@@ -204,7 +204,7 @@
   </head>
   <body>
     <div class="testbox">
-    <form action="/requests" method="POST">
+    <form action="/requests" method="POST" enctype="multipart/form-data">
       <div class="banner">
         <h1>Permission Request Form</h1>
       </div>
@@ -238,6 +238,11 @@
 
 
         <br><br>
+
+        <div class="custom-file mb-3">
+  <input type="file" name="file" id="file" class="custom-file-input">
+  <label for="file" class="custom-file-label">Choose File</label>
+</div>
         <div class="btn-block">
           <button type="submit" href="/success">Submit Request</button>
         </div>
