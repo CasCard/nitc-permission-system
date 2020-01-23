@@ -1,0 +1,14 @@
+<%- include('partials/header') %>
+
+  <% if(files){ %>
+            <% files.forEach(function(file) { %>
+              <div class="card card-body mb-3">
+                    <a href = "/files/<%= file.filename %>" target = "_blank"><%= file.filename %></a>
+              </div>
+              <% }) %>
+                <% } else { %>
+                  <p>No files to show</p>
+                  <% } %>
+
+</body>
+</html>
