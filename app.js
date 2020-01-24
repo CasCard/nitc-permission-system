@@ -23,7 +23,7 @@ const app = express();
 const mongoURI = 'mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB';
 
 // Create mongo connection
-const conn = mongoose.createConnection(mongoURI,{useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
+const conn = mongoose.createConnection(mongoURI,{useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex: true });
 
 let gfs;
 
@@ -76,7 +76,7 @@ mongoose.connect("mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongo
 mongoose.set("useCreateIndex", true);
 
 
-const requestSchema = {
+const requestSchema = new mongoose.Schema({
   from: String,//
   rollno: String,
   date: Date,
@@ -85,9 +85,9 @@ const requestSchema = {
   email: String,
   description: String,
   duration: String,
-  source:{ data:Buffer,contentType:String},
+  source:{data:Buffer,filename:String},
   current_status: [String],
-};
+});
 const userSchema = new mongoose.Schema({
   googleId: {
     type: String,
@@ -105,7 +105,7 @@ userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 
 const User = new mongoose.model("User", userSchema);
-const Request = mongoose.model("Request", requestSchema);
+const Request = new mongoose.model("Request", requestSchema);
 
 
 passport.use(User.createStrategy());
@@ -169,7 +169,7 @@ app.get("/login_failed", function(req, res) {
 app.get("/dashboard", function(req, res) {
 
   // "https://glacial-lake-64780.herokuapp.com/requests/B190257EP"
-  gfs.files.find().toArray((err, files) => {
+  gfs.files.find({}).toArray((err, files) => {
     // Check if files
     if (!files || files.length === 0) {
       request("http://localhost:3000/requests/B190257EP", function(error, response, body) {
