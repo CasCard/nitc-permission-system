@@ -23,7 +23,7 @@ const app = express();
 const mongoURI = 'mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB';
 
 // Create mongo connection
-const conn = mongoose.createConnection(mongoURI);
+const conn = mongoose.createConnection(mongoURI,{useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
 let gfs;
 
