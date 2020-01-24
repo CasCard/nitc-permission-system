@@ -23,7 +23,7 @@ const app = express();
 const mongoURI = 'mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB';
 
 // Create mongo connection
-const conn = mongoose.createConnection(mongoURI,{useNewUrlParser: true,useUnifiedTopology: true});
+const conn = mongoose.createConnection(mongoURI);
 
 let gfs;
 
@@ -52,6 +52,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 const storage=new GridFsStorage({
   url:"mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB",
+
   file:(req,file)=>{
     return new Promise((resolve,reject)=>{
       const filename=file.originalname;
@@ -61,7 +62,7 @@ const storage=new GridFsStorage({
       };
       resolve(fileInfo);
     });
-  }
+  },
 
 });
 
@@ -76,7 +77,7 @@ mongoose.set("useCreateIndex", true);
 
 
 const requestSchema = {
-  from: String,
+  from: String,//
   rollno: String,
   date: Date,
   purpose: String,
@@ -168,15 +169,51 @@ app.get("/login_failed", function(req, res) {
 app.get("/dashboard", function(req, res) {
 
   // "https://glacial-lake-64780.herokuapp.com/requests/B190257EP"
-
-  request("http://localhost:3000/requests/B190257EP", function(error, response, body) {
-    var data = JSON.parse(body);
-    console.log(data);
-    res.render("dashboard", {
-      username: req.user.displayName,
-      posts: data,
-    });
+  gfs.files.find().toArray((err, files) => {
+    // Check if files
+    if (!files || files.length === 0) {
+      request("http://localhost:3000/requests/B190257EP", function(error, response, body) {
+        var data = JSON.parse(body);
+        console.log(data);
+        res.render("dashboard", {
+          username: req.user.displayName,
+          posts: data,
+          files:false
+        });
+      });
+      // res.render('uploads', { files: false });
+    } else {
+      files.map(file => {
+        if (
+          file.contentType === 'image/jpeg' ||
+          file.contentType === 'image/png'
+        ) {
+          file.isImage = true;
+        } else {
+          file.isImage = false;
+        }
+      });
+      request("http://localhost:3000/requests/B190257EP", function(error, response, body) {
+        var data = JSON.parse(body);
+        console.log(data);
+        res.render("dashboard", {
+          username: req.user.displayName,
+          posts: data,
+          files:files
+        });
+      });
+      // res.render('uploads', { files: files });
+    }
   });
+
+  // request("http://localhost:3000/requests/B190257EP", function(error, response, body) {
+  //   var data = JSON.parse(body);
+  //   console.log(data);
+  //   res.render("dashboard", {
+  //     username: req.user.displayName,
+  //     posts: data,
+  //   });
+  // });
 });
 // "https://glacial-lake-64780.herokuapp.com/requests"
 
@@ -184,6 +221,24 @@ app.get("/dashboard", function(req, res) {
 
 
 app.get("/verification", function(req, res) {
+  gfs.files.find().toArray((err, files) => {
+    // Check if files
+    if (!files || files.length === 0) {
+      res.render('uploads', { files: false });
+    } else {
+      files.map(file => {
+        if (
+          file.contentType === 'image/jpeg' ||
+          file.contentType === 'image/png'
+        ) {
+          file.isImage = true;
+        } else {
+          file.isImage = false;
+        }
+      });
+      res.render('uploads', { files: files });
+    }
+  });
   request("http://localhost:3000/requests", function(error, response, body) {
     var data = JSON.parse(body);
     console.log(data);
