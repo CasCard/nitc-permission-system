@@ -9,8 +9,9 @@
     <% for(let j = 0; j < posts[i].to.length; j++) { %>
     <p><%= posts[i].to[j] %></p>
     <% } %>
-    <form action="/requests/B190257EP" method="post">
+    <form action="/requests/<%= posts[i].rollno %>" method="post">
       <input type="checkbox" name="status[0]">Confirm
+      <input type="checkbox" name="status[1]">Not Confirm
       <div class="btn-block">
         <button type="submit" href="/success">Submit</button>
       </div>

@@ -26,6 +26,10 @@ const mongoURI = 'mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongo
 const conn = mongoose.createConnection(mongoURI);
 
 let gfs;
+var email;
+var rollno;
+var role;
+var studentEmail;
 
 conn.once('open', () => {
   // Init stream
@@ -128,6 +132,11 @@ passport.use(new GoogleStrategy({
     hd: 'nitc.ac.in'
   },
   function(accessToken, refreshToken, profile, cb) {
+    email=profile._json.email;
+    rollno=email.substring(email.lastIndexOf("_")+1,email.lastIndexOf("@")).toUpperCase();
+    studentEmail=email.substring(email.lastIndexOf("_"),email.lastIndexOf("_")+1);
+    role=email.substring(0, email.lastIndexOf("@"));
+    console.log(rollno);
     if (profile._json.hd === "nitc.ac.in") {
       User.findOrCreate({
         googleId: profile.id,
@@ -159,22 +168,29 @@ app.get("/auth/google/dashboard",
     failureRedirect: "/login"
   }),
   function(req, res) {
+  if(studentEmail=='_'){
     res.redirect("/dashboard");
+  }else if(role == "sac"){
+    res.redirect("/sac_verification");
+  }else{
+    res.redirect("/fac_verification");
+  }
   });
+
 
 app.get("/login_failed", function(req, res) {
   res.render("login_failed");
 });
 
 app.get("/dashboard", function(req, res) {
-
   // "https://glacial-lake-64780.herokuapp.com/requests/B190257EP"
   gfs.files.find({}).toArray((err, files) => {
     // Check if files
     if (!files || files.length === 0) {
-      request("http://localhost:3000/requests/B190257EP", function(error, response, body) {
+      request("http://localhost:3000/requests/"+rollno, function(error, response, body) {
         var data = JSON.parse(body);
         console.log(data);
+        console.log(req);
         res.render("dashboard", {
           username: req.user.displayName,
           posts: data,
@@ -193,7 +209,7 @@ app.get("/dashboard", function(req, res) {
           file.isImage = false;
         }
       });
-      request("http://localhost:3000/requests/B190257EP", function(error, response, body) {
+      request("http://localhost:3000/requests/"+rollno, function(error, response, body) {
         var data = JSON.parse(body);
         console.log(data);
         res.render("dashboard", {
@@ -231,7 +247,12 @@ app.get("/verification", function(req, res) {
   });
 });
 
-
+app.get("/fac_verification", function(req, res) {
+  res.render("fac_verification");
+});
+app.get("/sac_verification", function(req, res) {
+  res.render("sac_verification");
+});
 
 
 app.get("/request", function(req, res) {
