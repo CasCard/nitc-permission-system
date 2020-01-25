@@ -30,6 +30,7 @@ var email;
 var rollno;
 var role;
 var studentEmail;
+var randomID = Math.floor(1000 + Math.random() * 9000);
 
 conn.once('open', () => {
   // Init stream
@@ -82,6 +83,7 @@ mongoose.set("useCreateIndex", true);
 
 const requestSchema = new mongoose.Schema({
   from: String,//
+  ID:Number,
   rollno: String,
   date: Date,
   purpose: String,
@@ -237,14 +239,28 @@ app.get("/dashboard", function(req, res) {
 
 
 app.get("/verification", function(req, res) {
-
-  request("http://localhost:3000/requests", function(error, response, body) {
-    var data = JSON.parse(body);
-    console.log(data);
-    res.render("verification", {
-      posts: data
-    });
-  });
+  res.render("verification");
+  // request("http://localhost:3000/requests", function(error, response, body) {
+  //   var data = JSON.parse(body);
+  //   console.log(data);
+  //   res.render("verification", {
+  //     posts: data
+  //   });
+  // });
+});
+app.post("/verification",function(req,res){
+  Request.find({
+    ID:req.body.id
+  },
+  function(err, foundRequest){
+    console.log(foundRequest[0].from);
+    if(foundRequest){
+    res.render("verification",{data:foundRequest[0]});
+    }else{
+      res.send(err);
+    }
+  }
+);
 });
 
 app.get("/fac_verification", function(req, res) {
@@ -278,6 +294,7 @@ app.route("/requests")
       const newRequest = new Request({
         purpose: req.body.purpose,
         from: req.body.from,
+        ID:randomID,
         rollno: req.body.rollno,
         date: req.body.date,
         to: req.body.part,
