@@ -230,14 +230,20 @@
         <textarea rows="3" name="description" required></textarea>
       </div>
       <p>Add authorities:</p>
-      <input type="text" name="part[0]">
+      <input type="text" name="auth[0]">
       <div id="participant"></div>
         <br>
-        <button type="button" onclick="addParticipant()">Add</button>
-        <button type="button" onclick="delParticipant()">Remove</button>
-
-
+        <button type="button" onclick="addAuth()">Add</button>
+        <button type="button" onclick="delAuth()">Remove</button>
         <br><br>
+
+      <p>Add Faculty E-mail:</p>
+      <input type="text" name="email[0]">
+        <div id="participantEmail"></div>
+          <br>
+          <button type="button" onclick="addAuthEmail()">Add</button>
+          <button type="button" onclick="delAuthEmail()">Remove</button>
+          <br><br>
 
         <div class="custom-file mb-3">
   <input type="file" name="file" id="file" class="custom-file-input">
@@ -249,20 +255,31 @@
     </form>
     </div>
     <script type="text/javascript">
-    var cont = 1;
-        function addParticipant() {
+    var count = 1;
+    var countEmail=1;
+        function addAuth(){
                 var div = document.createElement('div');
                 div.className = 'participant';
-                div.innerHTML = '<input type="text" name="part['+cont+']">';
-
+                div.innerHTML = '<input type="text" name="auth['+count+']">';
                 document.getElementById('participant').appendChild(div);
-                cont++
+                count++;
         }
-
-        function delParticipant() {
+        function delAuth(){
                 var select = document.getElementById('participant');
                 document.getElementById('participant').removeChild(select.lastChild);
-                cont--
+                count--;
+        }
+        function addAuthEmail() {
+                var div = document.createElement('div');
+                div.className = 'participantEmail';
+                div.innerHTML = '<input type="text" name="email['+countEmail+']">';
+                document.getElementById('participantEmail').appendChild(div);
+                countEmail++;
+        }
+        function delAuthEmail() {
+                var select = document.getElementById('participantEmail');
+                document.getElementById('participantEmail').removeChild(select.lastChild);
+                countEmail--;
         }
     </script>
   </body>
