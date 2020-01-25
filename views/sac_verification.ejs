@@ -1,2 +1,20 @@
 <%- include('partials/header') %>
-<h1 class="display-4">sac verification</h1>
+<h1 class="display-4">SAC Verification</h1>
+<h1>Recent requests</h1>
+<p>Purpose</p>
+<form action="/sac_verification" method="post">
+  <input type="text" name="id"/>
+  <div class="btn-block">
+    <button type="submit">Search</button>
+  </div>
+</form>
+<% if (locals.data) { %>
+    <h2><%= data.from %></h2>
+    <h2><%= data.key.SAC %></h2>
+    <h2><%= data.key.FAC %></h2>
+<% } %>
+<form action="/sac_update" method="post">
+  <div class="btn-block">
+    <button type="submit">Verify</button>
+  </div>
+</form>

@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const path = require('path');
 const fs = require('fs');
+const $ = require("jquery");
 const session = require('express-session');
 const mongoose = require('mongoose');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
@@ -31,6 +32,9 @@ var rollno;
 var role;
 var studentEmail;
 var randomID = Math.floor(1000 + Math.random() * 9000);
+var checkBoxStateFAC=false;
+var checkBoxStateSAC=false;
+var requestID;
 
 conn.once('open', () => {
   // Init stream
@@ -82,7 +86,7 @@ mongoose.set("useCreateIndex", true);
 
 
 const requestSchema = new mongoose.Schema({
-  from: String,//
+  from: String,
   ID:Number,
   rollno: String,
   date: Date,
@@ -92,7 +96,10 @@ const requestSchema = new mongoose.Schema({
   description: String,
   duration: String,
   source:{data:Buffer,filename:String},
-  current_status: [String],
+  key:{
+    SAC:{type:Boolean,required:true,default:false},
+    FAC:{type:Boolean,required:true,default:false}
+  }
 });
 const userSchema = new mongoose.Schema({
   googleId: {
@@ -248,19 +255,81 @@ app.get("/verification", function(req, res) {
   //   });
   // });
 });
-app.post("/verification",function(req,res){
+app.post("/sac_update",function(req,res){
+  console.log(requestID);
+  Request.update({
+    ID:requestID
+  },{
+    key:{SAC:true,FAC:true}
+  },function(err){
+    if(!err){
+      res.redirect("/sucess");
+    }else{
+      console.log(err);
+    }
+  });
+});
+app.post("/fac_update",function(req,res){
+  console.log(requestID);
+  Request.update({
+    ID:requestID
+  },{
+    key:{SAC:false,FAC:true}
+  },function(err){
+    if(!err){
+      res.redirect("/sucess");
+    }else{
+      console.log(err);
+    }
+  });
+});
+
+app.post("/sac_verification",function(req,res){
   Request.find({
     ID:req.body.id
   },
   function(err, foundRequest){
     console.log(foundRequest[0].from);
     if(foundRequest){
-    res.render("verification",{data:foundRequest[0]});
+    res.render("sac_verification",{data:foundRequest[0]});
     }else{
       res.send(err);
     }
   }
 );
+requestID=req.body.id;
+});
+
+app.post("/fac_verification",function(req,res){
+  Request.find({
+    ID:req.body.id
+  },
+  function(err, foundRequest){
+    console.log(foundRequest[0].from);
+    if(foundRequest){
+    res.render("fac_verification",{data:foundRequest[0]});
+    }else{
+      res.send(err);
+    }
+  }
+);
+requestID=req.body.id;
+});
+
+app.put('/verification',function(req,res){
+  Request.findOneAndUpdate({
+      ID: req.body.id
+    }, {
+      $set: {SAC:checkBoxStateSAC,FAC:checkBoxStateFAC},
+    },
+    function(err) {
+      if (!err) {
+        console.log("Successfully updated requests");
+      } else {
+        res.send(err);
+      }
+    }
+  );
 });
 
 app.get("/fac_verification", function(req, res) {
@@ -407,7 +476,6 @@ app.get("/logout", function(req, res) {
   console.log("Successfully logout");
   res.redirect("/");
 });
-
 
 let PORT = process.env.PORT || 3000;
 

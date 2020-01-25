@@ -1,28 +1,50 @@
 <%- include('partials/header') %>
-<a class="btn btn-dark btn-lg" href="/request" role="button">Create a request</a>
-<form action="/logout">
-        <button class="btn btn-lg btn-warning" type="submit" name="button">Logout</button>
-</form>
-<p>Welcome <%=username%></p>
+<p style = "text-align:center">Welcome <%=username%></p>
 
-<h1>Your recent requests</h1>
+<h1 style="text-align:center">Your recent requests</h1>
     <% for(let i = 0; i < posts.length; i++) { %>
-        <article>
-            <h2><%= posts[i].purpose %></h2>
+      <article>
+        <button type="button" class="collapsible"><h2> + <%= posts[i].purpose %></h1></button>
+          <div class="content">
             <p><a href = "/files/<%= posts[i].source.filename %>" target = "_blank"><%= posts[i].source.filename %></a></p>
             <% for(let j = 0; j < posts[i].to.length; j++) { %>
             <p><%= posts[i].to[j] %></p>
             <% } %>
             <% if(files){ %>
-                      <% files.forEach(function(file) { %>
-                        <% if(file.filename == 'Screenshot_1575225083.png'){ %>
-                        <div class="card card-body mb-3">
-                              <a href = "/files/<%= file.filename %>" target = "_blank"><%= file.filename %></a>
-                        </div>
-                        <% } %>
-                        <% }) %>
-                          <% } else { %>
-                            <p>No files to show</p>
-                            <% } %>
-        </article>
+              <% files.forEach(function(file) { %>
+                  <% if(file.filename == 'Screenshot_1575225083.png'){ %>
+                      <div class="card card-body mb-3">
+                          <a href = "/files/<%= file.filename %>" target = "_blank"><%= file.filename %></a>
+                      </div>
+                  <% } %>
+                <% }) %>
+              <% } else { %>
+                <p>No files to show</p>
+            <% } %>
+      </article>
     <% } %>
+     </div>
+    <%# Addition 3 %>
+    <script type="text/javascript">
+        let addRequestBtn = document.getElementById('add-request-btn');
+        addRequestBtn.style.opacity = 1;
+        addRequestBtn.href="/request";
+        addRequestBtn.title="Add Request";
+        let logoutBtn = document.getElementById('logout-btn');
+        logoutBtn.style.opacity = 1;
+        logoutBtn.href="";
+        logoutBtn.title="Log Out"
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+    for (i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+    </script>
