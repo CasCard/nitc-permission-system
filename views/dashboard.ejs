@@ -1,5 +1,8 @@
 <%- include('partials/header') %>
 <a class="btn btn-dark btn-lg" href="/request" role="button">Create a request</a>
+<form action="/logout">
+        <button class="btn btn-lg btn-warning" type="submit" name="button">Logout</button>
+</form>
 <p>Welcome <%=username%></p>
 
 <h1>Your recent requests</h1>
@@ -23,4 +26,3 @@
                             <% } %>
         </article>
     <% } %>
-    <a class="btn btn-dark btn-lg" href="/uploads" role="button">View uploaded documents</a>

@@ -23,7 +23,7 @@ const app = express();
 const mongoURI = 'mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB';
 
 // Create mongo connection
-const conn = mongoose.createConnection(mongoURI,{useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex: true });
+const conn = mongoose.createConnection(mongoURI);
 
 let gfs;
 
@@ -221,24 +221,7 @@ app.get("/dashboard", function(req, res) {
 
 
 app.get("/verification", function(req, res) {
-  gfs.files.find().toArray((err, files) => {
-    // Check if files
-    if (!files || files.length === 0) {
-      res.render('uploads', { files: false });
-    } else {
-      files.map(file => {
-        if (
-          file.contentType === 'image/jpeg' ||
-          file.contentType === 'image/png'
-        ) {
-          file.isImage = true;
-        } else {
-          file.isImage = false;
-        }
-      });
-      res.render('uploads', { files: files });
-    }
-  });
+
   request("http://localhost:3000/requests", function(error, response, body) {
     var data = JSON.parse(body);
     console.log(data);
