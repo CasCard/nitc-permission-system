@@ -11,14 +11,16 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const passport = require("passport");
-const findOrCreate = require('mongoose-findorcreate');
-const passportLocalMongoose = require("passport-local-mongoose");
+
 const request = require("request");
 const multer = require('multer');
 const GridFsStorage = require('multer-gridfs-storage');
 const Grid = require('gridfs-stream');
 const methodOverride = require('method-override');
 const app = express();
+
+const User = require('./models/user');
+const Request = require('./models/request');
 
 // Mongo URI
 const mongoURI = 'mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB';
@@ -35,6 +37,7 @@ var randomID = Math.floor(1000 + Math.random() * 9000);
 var checkBoxStateFAC=false;
 var checkBoxStateSAC=false;
 var requestID;
+var username;
 
 conn.once('open', () => {
   // Init stream
@@ -85,40 +88,9 @@ mongoose.connect("mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongo
 mongoose.set("useCreateIndex", true);
 
 
-const requestSchema = new mongoose.Schema({
-  from: String,
-  ID:Number,
-  rollno: String,
-  date: Date,
-  purpose: String,
-  to: [String],
-  fac_email: [String],
-  description: String,
-  duration: String,
-  source:{data:Buffer,filename:String},
-  key:{
-    SAC:{type:Boolean,required:true,default:false},
-    FAC:{type:Boolean,required:true,default:false}
-  }
-});
-const userSchema = new mongoose.Schema({
-  googleId: {
-    type: String,
-    index: {
-      unique: true
-    }
-  },
-  displayName: String,
-  email: String
-}, {
-  autoIndex: false
-});
 
-userSchema.plugin(passportLocalMongoose);
-userSchema.plugin(findOrCreate);
 
-const User = new mongoose.model("User", userSchema);
-const Request = new mongoose.model("Request", requestSchema);
+
 
 
 passport.use(User.createStrategy());
@@ -159,8 +131,8 @@ passport.use(new GoogleStrategy({
 ));
 
 
-app.get("/", function(req, res) {
-  res.render("login");
+app.get("/",function(req, res) {
+    res.render('login');
 });
 
 
@@ -171,9 +143,9 @@ app.get("/auth/google",
   })
 );
 
-
 app.get("/auth/google/dashboard",
   passport.authenticate('google', {
+    sucessRedirect:"/dashboard",
     failureRedirect: "/login"
   }),
   function(req, res) {
@@ -191,7 +163,7 @@ app.get("/login_failed", function(req, res) {
   res.render("login_failed");
 });
 
-app.get("/dashboard", function(req, res) {
+app.get("/dashboard",function(req, res) {
   // "https://glacial-lake-64780.herokuapp.com/requests/B190257EP"
   gfs.files.find({}).toArray((err, files) => {
     // Check if files
@@ -299,7 +271,7 @@ app.post("/sac_verification",function(req,res){
 );
 requestID=req.body.id;
 });
-
+// Need to work here
 app.post("/fac_verification",function(req,res){
   Request.find({
     ID:req.body.id
