@@ -15,7 +15,8 @@ const requestSchema = new mongoose.Schema({
   source:{data:Buffer,filename:String},
   key:{
     SAC:{type:Boolean,required:true,default:false},
-    FAC:{type:Boolean,required:true,default:false}
+    FAC:{type:Boolean,required:true,default:false},
+    WTLST:{type:Boolean,required:true,default:true}
   }
 });
 module.exports=mongoose.model("Request", requestSchema);

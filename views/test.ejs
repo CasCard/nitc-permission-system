@@ -1,0 +1,10 @@
+<% if (locals.data) { %>
+  <h3>From : <%= data.from %></h3>
+  <h3>Purpose : <%= data.purpose %></h3>
+  <h3>Roll Number :  <%= data.rollno %></h3>
+  <h3>Date of Submission :  <%= data.date.getDate()%>/<%=data.date.getMonth()+1 %>/<%=data.date.getFullYear()%></h3>
+  <h3>Description :  <%= data.description %></h3>
+  <h3>SAC status : <%= data.key.SAC %></h3>
+  <h3>FAC status : <%= data.key.FAC %></h3>
+  <p><a href = "/files/<%= data.source.filename %>" target = "_blank"><%= data.source.filename %></a></p>
+<% } %>

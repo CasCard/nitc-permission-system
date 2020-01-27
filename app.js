@@ -11,19 +11,19 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const passport = require("passport");
-
 const request = require("request");
 const multer = require('multer');
 const GridFsStorage = require('multer-gridfs-storage');
 const Grid = require('gridfs-stream');
 const methodOverride = require('method-override');
+
 const app = express();
 
 const User = require('./models/user');
 const Request = require('./models/request');
 
 // Mongo URI
-const mongoURI = 'mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB';
+const mongoURI = "mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB";
 
 // Create mongo connection
 const conn = mongoose.createConnection(mongoURI);
@@ -33,6 +33,7 @@ var email;
 var rollno;
 var role;
 var studentEmail;
+var facultyEmail;
 var randomID = Math.floor(1000 + Math.random() * 9000);
 var checkBoxStateFAC=false;
 var checkBoxStateSAC=false;
@@ -62,8 +63,9 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 const storage=new GridFsStorage({
-  url:"mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB",
+  url:mongoURI,
 
   file:(req,file)=>{
     return new Promise((resolve,reject)=>{
@@ -80,18 +82,12 @@ const storage=new GridFsStorage({
 
 var upload = multer({storage:storage});
 
-mongoose.connect("mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB", {
+mongoose.connect(mongoURI, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
   autoIndex: false
 });
 mongoose.set("useCreateIndex", true);
-
-
-
-
-
-
 
 passport.use(User.createStrategy());
 passport.serializeUser(function(user, done) {
@@ -178,7 +174,6 @@ app.get("/dashboard",function(req, res) {
           files:false
         });
       });
-      // res.render('uploads', { files: false });
     } else {
       files.map(file => {
         if (
@@ -199,18 +194,8 @@ app.get("/dashboard",function(req, res) {
           files:files
         });
       });
-      // res.render('uploads', { files: files });
     }
   });
-
-  // request("http://localhost:3000/requests/B190257EP", function(error, response, body) {
-  //   var data = JSON.parse(body);
-  //   console.log(data);
-  //   res.render("dashboard", {
-  //     username: req.user.displayName,
-  //     posts: data,
-  //   });
-  // });
 });
 // "https://glacial-lake-64780.herokuapp.com/requests"
 
@@ -229,10 +214,10 @@ app.get("/verification", function(req, res) {
 });
 app.post("/sac_update",function(req,res){
   console.log(requestID);
-  Request.update({
+  Request.updateOne({
     ID:requestID
   },{
-    key:{SAC:true,FAC:true}
+    key:{SAC:true,FAC:true,WTLST:false}
   },function(err){
     if(!err){
       res.redirect("/sucess");
@@ -241,12 +226,12 @@ app.post("/sac_update",function(req,res){
     }
   });
 });
-app.post("/fac_update",function(req,res){
+app.post("/update/7764",function(req,res){
   console.log(requestID);
-  Request.update({
-    ID:requestID
+  Request.updateOne({
+    ID:7764,
   },{
-    key:{SAC:false,FAC:true}
+    key:{SAC:false,FAC:true,WTLST:false}
   },function(err){
     if(!err){
       res.redirect("/sucess");
@@ -256,7 +241,11 @@ app.post("/fac_update",function(req,res){
   });
 });
 
-app.post("/sac_verification",function(req,res){
+app.route("/sac_verification")
+.get(function(req, res) {
+  res.render("sac_verification");
+})
+.post(function(req,res){
   Request.find({
     ID:req.body.id
   },
@@ -271,15 +260,20 @@ app.post("/sac_verification",function(req,res){
 );
 requestID=req.body.id;
 });
+
 // Need to work here
-app.post("/fac_verification",function(req,res){
+app.route("/fac_verification")
+.get(function(req, res) {
+  res.render("fac_verification");
+})
+.post(function(req,res){
+  facultyEmail=req.body.facEmail;
   Request.find({
-    ID:req.body.id
+    fac_email:req.body.facEmail
   },
   function(err, foundRequest){
-    console.log(foundRequest[0].from);
     if(foundRequest){
-    res.render("fac_verification",{data:foundRequest[0]});
+    res.render("fac_verification",{posts:foundRequest});
     }else{
       res.send(err);
     }
@@ -288,28 +282,8 @@ app.post("/fac_verification",function(req,res){
 requestID=req.body.id;
 });
 
-app.put('/verification',function(req,res){
-  Request.findOneAndUpdate({
-      ID: req.body.id
-    }, {
-      $set: {SAC:checkBoxStateSAC,FAC:checkBoxStateFAC},
-    },
-    function(err) {
-      if (!err) {
-        console.log("Successfully updated requests");
-      } else {
-        res.send(err);
-      }
-    }
-  );
-});
 
-app.get("/fac_verification", function(req, res) {
-  res.render("fac_verification");
-});
-app.get("/sac_verification", function(req, res) {
-  res.render("sac_verification");
-});
+
 
 
 app.get("/request", function(req, res) {
@@ -343,7 +317,6 @@ app.route("/requests")
         description: req.body.description,
         duration: req.body.duration,
         source:req.file,
-        current_status: req.body.status
       });
       newRequest.save(function(err) {
         if (!err) {
@@ -365,28 +338,6 @@ app.route("/requests")
       });
     }
   );
-
-  app.get('/uploads', (req, res) => {
-    gfs.files.find().toArray((err, files) => {
-      // Check if files
-      if (!files || files.length === 0) {
-        res.render('uploads', { files: false });
-      } else {
-        files.map(file => {
-          if (
-            file.contentType === 'image/jpeg' ||
-            file.contentType === 'image/png'
-          ) {
-            file.isImage = true;
-          } else {
-            file.isImage = false;
-          }
-        });
-        res.render('uploads', { files: files });
-      }
-    });
-  });
-
 
 app.get('/files/:filename', (req, res) => {
   gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
@@ -446,7 +397,7 @@ app.get("/success", function(req, res) {
 app.get("/logout", function(req, res) {
   req.logout();
   console.log("Successfully logout");
-  res.redirect("/");
+  res.redirect("https://accounts.google.com/logout");
 });
 
 let PORT = process.env.PORT || 3000;
