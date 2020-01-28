@@ -14,9 +14,10 @@ const requestSchema = new mongoose.Schema({
   duration: String,
   source:{data:Buffer,filename:String},
   key:{
-    SAC:{type:Boolean,required:true,default:false},
-    FAC:{type:Boolean,required:true,default:false},
-    WTLST:{type:Boolean,required:true,default:true}
+    WTLST:[String],
+    NCNF:[String],
+    CNF:[String],
   }
 });
+
 module.exports=mongoose.model("Request", requestSchema);

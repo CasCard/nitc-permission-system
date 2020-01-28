@@ -21,6 +21,7 @@ const app = express();
 
 const User = require('./models/user');
 const Request = require('./models/request');
+const DataCollection = require('./models/request');
 
 // Mongo URI
 const mongoURI = "mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB";
@@ -39,6 +40,7 @@ var checkBoxStateFAC=false;
 var checkBoxStateSAC=false;
 var requestID;
 var username;
+var arrID=[];
 
 conn.once('open', () => {
   // Init stream
@@ -200,24 +202,13 @@ app.get("/dashboard",function(req, res) {
 // "https://glacial-lake-64780.herokuapp.com/requests"
 
 
-
-
-app.get("/verification", function(req, res) {
-  res.render("verification");
-  // request("http://localhost:3000/requests", function(error, response, body) {
-  //   var data = JSON.parse(body);
-  //   console.log(data);
-  //   res.render("verification", {
-  //     posts: data
-  //   });
-  // });
-});
 app.post("/sac_update",function(req,res){
   console.log(requestID);
   Request.updateOne({
     ID:requestID
   },{
-    key:{SAC:true,FAC:true,WTLST:false}
+    $push:{'key.CNF':['sac@nitc.ac.in']},
+    $pull:{'key.WTLST':'sac@nitc.ac.in'}
   },function(err){
     if(!err){
       res.redirect("/sucess");
@@ -226,12 +217,44 @@ app.post("/sac_update",function(req,res){
     }
   });
 });
-app.post("/update/7764",function(req,res){
+app.post("/sac_decline",function(req,res){
   console.log(requestID);
   Request.updateOne({
-    ID:7764,
+    ID:requestID
   },{
-    key:{SAC:false,FAC:true,WTLST:false}
+    $push:{'key.NCNF':['sac@nitc.ac.in']},
+    $pull:{'key.WTLST':'sac@nitc.ac.in'}
+  },function(err){
+    if(!err){
+      res.redirect("/sucess");
+    }else{
+      console.log(err);
+    }
+  });
+});
+app.post("/update/:ID",function(req,res){
+  console.log(facultyEmail);
+  Request.updateOne({
+    ID:req.params.ID,
+  },{
+    $push:{'key.CNF':[facultyEmail]},
+    $pull:{'key.WTLST':facultyEmail}
+  },function(err){
+    if(!err){
+      res.redirect("/sucess");
+    }else{
+      console.log(err);
+    }
+  });
+});
+
+app.post("/decline/:ID",function(req,res){
+  console.log(facultyEmail);
+  Request.updateOne({
+    ID:req.params.ID,
+  },{
+    $push:{'key.NCNF':[facultyEmail]},
+    $pull:{'key.WTLST':facultyEmail}
   },function(err){
     if(!err){
       res.redirect("/sucess");
@@ -247,7 +270,7 @@ app.route("/sac_verification")
 })
 .post(function(req,res){
   Request.find({
-    ID:req.body.id
+    ID:req.body.id,
   },
   function(err, foundRequest){
     console.log(foundRequest[0].from);
@@ -269,10 +292,15 @@ app.route("/fac_verification")
 .post(function(req,res){
   facultyEmail=req.body.facEmail;
   Request.find({
-    fac_email:req.body.facEmail
+    fac_email:req.body.facEmail,
+    'key.WTLST':req.body.facEmail
   },
   function(err, foundRequest){
     if(foundRequest){
+      for(let i = 0; i < foundRequest.length; i++) {
+        arrID.push(foundRequest[i].ID);
+      }
+    console.log(arrID);
     res.render("fac_verification",{posts:foundRequest});
     }else{
       res.send(err);
@@ -314,6 +342,7 @@ app.route("/requests")
         date: req.body.date,
         to: req.body.auth,
         fac_email:req.body.email,
+        key:{WTLST:req.body.email},
         description: req.body.description,
         duration: req.body.duration,
         source:req.file,

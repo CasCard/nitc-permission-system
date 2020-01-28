@@ -10,17 +10,6 @@
             <% for(let j = 0; j < posts[i].to.length; j++) { %>
             <p><%= posts[i].to[j] %></p>
             <% } %>
-            <% if(files){ %>
-              <% files.forEach(function(file) { %>
-                  <% if(file.filename == 'Screenshot_1575225083.png'){ %>
-                      <div class="card card-body mb-3">
-                          <a href = "/files/<%= file.filename %>" target = "_blank"><%= file.filename %></a>
-                      </div>
-                  <% } %>
-                <% }) %>
-              <% } else { %>
-                <p>No files to show</p>
-            <% } %>
       </article>
     <% } %>
      </div>
