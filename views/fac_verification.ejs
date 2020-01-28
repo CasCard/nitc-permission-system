@@ -1,36 +1,53 @@
 <%- include('partials/header') %>
+<script src="https://kit.fontawesome.com/4020b33d47.js" crossorigin="anonymous"></script>
 <h1 class="display-4">Faculty verification</h1>
 <h1>Recent requests</h1>
-<p>Purpose</p>
-<form action="/fac_verification" method="post">
+<form style = "text-align : center" action="/fac_verification" method="post">
   <input type="text" name="facEmail"/>
-  <div class="btn-block">
-    <button type="submit">Search</button>
-  </div>
+    <button type="submit"><i class="fas fa-search"></i></button>
 </form>
 <% if (locals.posts) { %>
 <% for(let i = 0; i < posts.length; i++) { %>
   <article>
-    <button type="button" class="collapsible"><h2> + <%= posts[i].purpose %></h1></button>
-      <div class="content">
-        <p><a href = "/files/<%= posts[i].source.filename %>" target = "_blank"><%= posts[i].source.filename %></a></p>
-        <% for(let j = 0; j < posts[i].to.length; j++) { %>
-        <p><%= posts[i].to[j] %></p>
-        <% } %>
-  </article>
-  <form action="/update/<%=posts[i].ID%>" method="post">
-    <div class="btn-block">
-      <button type="submit">Verify</button>
-    </div>
-  </form>
-  <form action="/decline/<%=posts[i].ID%>" method="post">
-    <div class="btn-block">
-      <button type="submit">Decline</button>
-    </div>
-  </form>
+      <button id = "btn1" type="button" style =  "width : 60%; margin-left : 20%;" class="collapsible"><h2> <i class="fas fa-bars"></i> <%= posts[i].purpose %></h2></button>
+        <div type = "button" style= "width : 60%; margin-left : 20%" class="content">
+          <p>Date of Submission : <%= dates = new Date(posts[i].date).getDate();%>/<%=dates = new Date(posts[i].date).getMonth()+1;  %>/<%=dates = new Date(posts[i].date).getFullYear();%></p>
+          <p>File uploaded : <a href = "/files/<%= posts[i].source.filename %>" target = "_blank"><%= posts[i].source.filename %></a></p>
+          <% for(let j = 0; j < posts[i].to.length; j++) { %>
+          <p>To : <%= posts[i].to[j] %></p>
+          <% } %>
+          <p>Description : <%= posts[i].description%></p>
+          <% if(posts[i].key.SAC == false){ %>
+            <a>SAC verified : <img src = "./x.png" alt = "cross" width="20px" height="20px"></img></a>
+          <% } %>
+          <% if(posts[i].key.SAC == true){ %>
+            <a>SAC verified : <img src = "./check.png" alt = "check" width="20px" height="20px"></img></a>
+          <% } %>
+          <% if(posts[i].key.FAC == false){ %>
+            <a>FAC verified : <img src = "./x.png" alt = "cross" width="20px" height="20px"></img></a>
+          <% } %>
+          <% if(posts[i].key.FAC == true){ %>
+            <a>FAC verified : <img src = "./check.png" alt = "check" width="20px" height="20px"></img></a>
+          <% } %>
+          <form action="/update/<%=posts[i].ID%>" method="post">
+            <div class="btn-block">
+              <button type="submit">Verify</button>
+            </div>
+          </form>
+          <form action="/decline/<%=posts[i].ID%>" method="post">
+            <div class="btn-block">
+              <button type="submit">Decline</button>
+            </div>
+          </form>
+</article>
 <% } %>
 <% } %>
 <script type="text/javascript">
+  let addRequestBtn = document.getElementById('add-request-btn');
+  addRequestBtn.style.opacity = 0;
+  addRequestBtn.href="";
+  addRequestBtn.title="";
+  let logoutBtn = document.getElementById('logout-btn');
 var coll = document.getElementsByClassName("collapsible");
 var i;
 for (i = 0; i < coll.length; i++) {

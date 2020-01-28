@@ -1,12 +1,8 @@
 <%- include('partials/header') %>
 <h1 class="display-4">SAC Verification</h1>
-<h1>Recent requests</h1>
-<p>Purpose</p>
-<form action="/sac_verification" method="post">
+<form style ="text-align:center" action="/sac_verification" method="post">
   <input type="text" name="id"/>
-  <div class="btn-block">
-    <button type="submit">Search</button>
-  </div>
+    <button type="submit"><i class="fas fa-search"></i></button>
 </form>
 <% if (locals.data) { %>
   <div  style ="text-align:center">
@@ -15,18 +11,23 @@
     <h3>Roll Number :  <%= data.rollno %></h3>
     <h3>Date of Submission :  <%= data.date.getDate()%>/<%=data.date.getMonth()+1 %>/<%=data.date.getFullYear()%></h3>
     <h3>Description :  <%= data.description %></h3>
-    <h3>SAC status : <%= data.key.SAC %></h3>
     <h3>FAC status : <%= data.key.FAC %></h3>
     <p><a href = "/files/<%= data.source.filename %>" target = "_blank"><%= data.source.filename %></a></p>
+    <form action="/sac_update" method="post">
+      <div class="btn-block">
+        <button type="submit">Verify</button>
+      </div>
+    </form>
+    <form action="/sac_decline" method="post">
+      <div class="btn-block">
+        <button type="submit">Decline</button>
+      </div>
+    </form>
   </div>
 <% } %>
-<form action="/sac_update" method="post">
-  <div class="btn-block">
-    <button type="submit">Verify</button>
-  </div>
-</form>
-<form action="/sac_decline" method="post">
-  <div class="btn-block">
-    <button type="submit">Decline</button>
-  </div>
-</form>
+<script type="text/javascript">
+    let addRequestBtn = document.getElementById('add-request-btn');
+    addRequestBtn.style.opacity = 0;
+    addRequestBtn.href="";
+    addRequestBtn.title="";
+</script>

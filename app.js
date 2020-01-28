@@ -102,11 +102,11 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
-// "https://glacial-lake-64780.herokuapp.com/auth/google/dashboard"
+// "https://nitc-permissions.herokuapp.com/auth/google/dashboard"
 passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/google/dashboard",
+    callbackURL: "https://nitc-permissions.herokuapp.com/auth/google/dashboard",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     hd: 'nitc.ac.in'
   },
@@ -169,7 +169,7 @@ app.get("/login_failed", function(req, res) {
     gfs.files.find({}).toArray((err, files) => {
       // Check if files
       if (!files || files.length === 0) {
-        request("http://localhost:3000/requests/"+rollno, function(error, response, body) {
+        request("http://nitc-permissions.herokuapp.com/requests/"+rollno, function(error, response, body) {
           var data = JSON.parse(body);
           console.log(data);
           console.log(req);
@@ -191,7 +191,7 @@ app.get("/login_failed", function(req, res) {
           }
         });
 
-        request("http://localhost:3000/requests/"+rollno, function(error, response, body) {
+        request("http://nitc-permissions.herokuapp.com/requests/"+rollno, function(error, response, body) {
 
           var data = JSON.parse(body);
           console.log(data);
@@ -226,7 +226,7 @@ app.post("/sac_update",function(req,res){
     $pull:{'key.WTLST':'sac@nitc.ac.in'}
   },function(err){
     if(!err){
-      res.redirect("/success");
+      res.redirect("/sac_verification");
     }else{
       console.log(err);
     }
@@ -241,7 +241,7 @@ app.post("/sac_decline",function(req,res){
     $pull:{'key.WTLST':'sac@nitc.ac.in'}
   },function(err){
     if(!err){
-      res.redirect("/sucess");
+      res.redirect("/sac_verification");
     }else{
       console.log(err);
     }
@@ -256,7 +256,7 @@ app.post("/update/:ID",function(req,res){
     $pull:{'key.WTLST':facultyEmail}
   },function(err){
     if(!err){
-      res.redirect("/sucess");
+      res.redirect("/fac_verification");
     }else{
       console.log(err);
     }
@@ -272,7 +272,7 @@ app.post("/decline/:ID",function(req,res){
     $pull:{'key.WTLST':facultyEmail}
   },function(err){
     if(!err){
-      res.redirect("/sucess");
+      res.redirect("/fac_verification");
     }else{
       console.log(err);
     }

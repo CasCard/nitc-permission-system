@@ -2,17 +2,41 @@
 <p style = "text-align:center">Welcome <%=username%></p>
 
 <h1 style="text-align:center">Your recent requests</h1>
-    <% for(let i = 0; i < posts.length; i++) { %>
-      <article>
-        <button type="button" class="collapsible"><h2> + <%= posts[i].purpose %></h1></button>
-          <div class="content">
-            <p><a href = "/files/<%= posts[i].source.filename %>" target = "_blank"><%= posts[i].source.filename %></a></p>
-            <% for(let j = 0; j < posts[i].to.length; j++) { %>
-            <p><%= posts[i].to[j] %></p>
-            <% } %>
-      </article>
-    <% } %>
-     </div>
+<% for(let i = 0; i < posts.length; i++) { %>
+  <article>
+    <button id = "btn1" type="button" style =  "width : 60%; margin-left : 20%;" class="collapsible"><h2> <i class="fas fa-bars"></i> <%= posts[i].purpose %></h2></button>
+      <div type = "button" style= "width : 60%; margin-left : 20%" class="content">
+        <p>Date of Submission : <%= dates = new Date(posts[i].date).getDate();%>/<%=dates = new Date(posts[i].date).getMonth()+1;  %>/<%=dates = new Date(posts[i].date).getFullYear();%></p>
+        <p>File uploaded : <a href = "/files/<%= posts[i].source.filename %>" target = "_blank"><%= posts[i].source.filename %></a></p>
+        <p>To,</p>
+        <% for(let j = 0; j < posts[i].to.length; j++) { %>
+        <p>&#160&#160&#160&#160&#160<%= posts[i].to[j] %>(<%=posts[i].fac_email[j]%>)</p>
+        <% } %>
+        <p>Description : <%= posts[i].description%></p>
+        <% if(files){ %>
+          <% files.forEach(function(file) { %>
+              <% if(file.filename == 'Screenshot_1575225083.png'){ %>
+                  <div class="card card-body mb-3">
+                      <a href = "/files/<%= file.filename %>" target = "_blank"><%= file.filename %></a>
+                  </div>
+              <% } %>
+            <% }) %>
+          <% } else { %>
+            <p>No files to show</p>
+        <% } %>
+        <% for(let j =0; j < posts[i].key.WTLST.length; j++) { %>
+        <p><%= posts[i].key.WTLST[j] %>&#160<i class="far fa-clock"></i></p>
+        <% } %>
+        <% for(let j =0; j < posts[i].key.NCNF.length; j++) {%>
+        <p><%= posts[i].key.NCNF[j] %>&#160<img src = "./x.png" width="15px" height="15px"></img></p>
+        <% } %>
+        <% for(let j =0; j < posts[i].key.CNF.length; j++) {%>
+        <p><%= posts[i].key.CNF[j] %>&#160<img src = "./check.png" width="15px" height="15px"></img></p>
+        <% } %>
+        <p>Verification by SAC is at the SAC office after Faculty Verification.</p>
+  </article>
+<% } %>
+ </div>
     <%# Addition 3 %>
     <script type="text/javascript">
         let addRequestBtn = document.getElementById('add-request-btn');
