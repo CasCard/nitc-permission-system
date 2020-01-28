@@ -143,7 +143,7 @@ app.get("/auth/google",
 
 app.get("/auth/google/dashboard",
   passport.authenticate('google', {
-    sucessRedirect:"/dashboard",
+    successRedirect:"/dashboard",
     failureRedirect: "/login"
   }),
   function(req, res) {
@@ -161,44 +161,59 @@ app.get("/login_failed", function(req, res) {
   res.render("login_failed");
 });
 
-app.get("/dashboard",function(req, res) {
-  // "https://glacial-lake-64780.herokuapp.com/requests/B190257EP"
-  gfs.files.find({}).toArray((err, files) => {
-    // Check if files
-    if (!files || files.length === 0) {
-      request("http://localhost:3000/requests/"+rollno, function(error, response, body) {
-        var data = JSON.parse(body);
-        console.log(data);
-        console.log(req);
-        res.render("dashboard", {
-          username: req.user.displayName,
-          posts: data,
-          files:false
+
+  app.get("/dashboard",function(req, res) {
+    console.log(req.user);
+    if(req.user != undefined){
+    // "https://glacial-lake-64780.herokuapp.com/requests/B190257EP"
+    gfs.files.find({}).toArray((err, files) => {
+      // Check if files
+      if (!files || files.length === 0) {
+        request("http://localhost:3000/requests/"+rollno, function(error, response, body) {
+          var data = JSON.parse(body);
+          console.log(data);
+          console.log(req);
+          res.render("dashboard", {
+            username: req.user.displayName,
+            posts: data,
+            files:false
+          });
         });
-      });
-    } else {
-      files.map(file => {
-        if (
-          file.contentType === 'image/jpeg' ||
-          file.contentType === 'image/png'
-        ) {
-          file.isImage = true;
-        } else {
-          file.isImage = false;
+      } else {
+        files.map(file => {
+          if (
+            file.contentType === 'image/jpeg' ||
+            file.contentType === 'image/png'
+          ) {
+            file.isImage = true;
+          } else {
+            file.isImage = false;
+          }
+        });
+
+        request("http://localhost:3000/requests/"+rollno, function(error, response, body) {
+
+          var data = JSON.parse(body);
+          console.log(data);
+          res.render("dashboard", {
+            username: req.user.displayName,
+            posts: data,
+            files:files
+          });
         }
-      });
-      request("http://localhost:3000/requests/"+rollno, function(error, response, body) {
-        var data = JSON.parse(body);
-        console.log(data);
-        res.render("dashboard", {
-          username: req.user.displayName,
-          posts: data,
-          files:files
-        });
-      });
-    }
+      );
+
+      }
+    });
+
+}else{
+  res.redirect('/');
+}
   });
-});
+
+
+
+
 // "https://glacial-lake-64780.herokuapp.com/requests"
 
 
@@ -211,7 +226,7 @@ app.post("/sac_update",function(req,res){
     $pull:{'key.WTLST':'sac@nitc.ac.in'}
   },function(err){
     if(!err){
-      res.redirect("/sucess");
+      res.redirect("/success");
     }else{
       console.log(err);
     }
