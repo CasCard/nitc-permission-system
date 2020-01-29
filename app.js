@@ -25,6 +25,8 @@ const DataCollection = require('./models/request');
 
 // Mongo URI
 const mongoURI = "mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB";
+// const appURI="https://nitc-permissions.herokuapp.com/";
+const appURI="http://localhost:3000/";
 
 // Create mongo connection
 const conn = mongoose.createConnection(mongoURI);
@@ -106,7 +108,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: "https://nitc-permissions.herokuapp.com/auth/google/dashboard",
+    callbackURL: appURI+"auth/google/dashboard",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     hd: 'nitc.ac.in'
   },
@@ -141,12 +143,13 @@ app.get("/auth/google",
   })
 );
 
+
 app.get("/auth/google/dashboard",
   passport.authenticate('google', {
-    successRedirect:"/dashboard",
     failureRedirect: "/login"
   }),
   function(req, res) {
+    console.log(studentEmail);
   if(studentEmail=='_'){
     res.redirect("/dashboard");
   }else if(role == "sac"){
@@ -169,7 +172,7 @@ app.get("/login_failed", function(req, res) {
     gfs.files.find({}).toArray((err, files) => {
       // Check if files
       if (!files || files.length === 0) {
-        request("http://nitc-permissions.herokuapp.com/requests/"+rollno, function(error, response, body) {
+        request(appURI+"requests/"+rollno, function(error, response, body) {
           var data = JSON.parse(body);
           console.log(data);
           console.log(req);
@@ -191,7 +194,7 @@ app.get("/login_failed", function(req, res) {
           }
         });
 
-        request("http://nitc-permissions.herokuapp.com/requests/"+rollno, function(error, response, body) {
+        request(appURI+"requests/"+rollno, function(error, response, body) {
 
           var data = JSON.parse(body);
           console.log(data);
@@ -280,7 +283,9 @@ app.post("/decline/:ID",function(req,res){
 });
 
 app.route("/sac_verification")
-.get(function(req, res) {
+.get(
+
+  function(req, res) {
   res.render("sac_verification");
 })
 .post(function(req,res){
@@ -301,7 +306,8 @@ requestID=req.body.id;
 
 // Need to work here
 app.route("/fac_verification")
-.get(function(req, res) {
+.get(
+  function(req, res) {
   res.render("fac_verification");
 })
 .post(function(req,res){
@@ -439,9 +445,10 @@ app.get("/success", function(req, res) {
 });
 
 app.get("/logout", function(req, res) {
-  req.logout();
-  console.log("Successfully logout");
-  res.redirect("https://accounts.google.com/logout");
+  req.session.destroy(function(e){
+       req.logout();
+       res.redirect("https://accounts.google.com/logout");
+   });
 });
 
 let PORT = process.env.PORT || 3000;

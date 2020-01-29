@@ -209,11 +209,11 @@
         <h1>Permission Request Form</h1>
       </div>
       <div class="item">
-        <p>Purpose</p>
-        <input type="text" name="purpose"/>
+        <p>Purpose:<span class="required">*</span></p>
+        <input type="text" name="purpose" required/>
       </div>
       <div class="item">
-        <p>Date</p>
+        <p>Date of Event:<span class="required">*</span></p>
         <input type="date" name="date" required/>
         <i class="fas fa-calendar-alt"></i>
       </div>
@@ -229,16 +229,16 @@
         <p>Include a letter of support from advisor in application packet.<span class="required">*</span></p>
         <textarea rows="3" name="description" required></textarea>
       </div>
-      <p>Add authorities:</p>
-      <input type="text" name="auth[0]">
+      <p>Add authorities<span class="required">*</span>:</p>
+      <input type="text" name="auth[0]" required>
       <div id="participant"></div>
         <br>
         <button type="button" onclick="addAuth()">Add</button>
         <button type="button"fac_verification onclick="delAuth()">Remove</button>
         <br><br>
 
-      <p>Add Faculty E-mail:</p>
-      <input type="text" name="email[0]">
+      <p>Add Faculty E-mail<span class="required">*</span>:</p>
+      <input type="text" name="email[0]" required>
         <div id="participantEmail"></div>
           <br>
           <button type="button" onclick="addAuthEmail()">Add</button>
@@ -246,8 +246,8 @@
           <br><br>
 
         <div class="custom-file mb-3">
-  <input type="file" name="file" id="file" class="custom-file-input">
-  <label for="file" class="custom-file-label">Choose File</label>
+          <label for="file" class="custom-file-label">Choose File<span class="required">*</span></label>
+          <input type="file" name="file" id="file" class="custom-file-input">
 </div>
         <div class="btn-block">
           <button type="submit" href="/success">Submit Request</button>
