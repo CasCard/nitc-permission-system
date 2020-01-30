@@ -281,10 +281,14 @@ app.post("/decline/:ID",function(req,res){
     }
   });
 });
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/');
+}
 
 app.route("/sac_verification")
 .get(
-
+  ensureAuthenticated,
   function(req, res) {
   res.render("sac_verification");
 })
@@ -307,6 +311,7 @@ requestID=req.body.id;
 // Need to work here
 app.route("/fac_verification")
 .get(
+  ensureAuthenticated,
   function(req, res) {
   res.render("fac_verification");
 })
