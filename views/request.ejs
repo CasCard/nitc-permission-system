@@ -233,17 +233,13 @@
       <input type="text" name="auth[0]" required>
       <div id="participant"></div>
         <br>
+        <p>Add Faculty E-mail<span class="required">*</span>:</p>
+        <input type="text" name="email[0]" required>
+          <div id="participantEmail"></div>
+            <br>
         <button type="button" onclick="addAuth()">Add</button>
         <button type="button"fac_verification onclick="delAuth()">Remove</button>
         <br><br>
-
-      <p>Add Faculty E-mail<span class="required">*</span>:</p>
-      <input type="text" name="email[0]" required>
-        <div id="participantEmail"></div>
-          <br>
-          <button type="button" onclick="addAuthEmail()">Add</button>
-          <button type="button" onclick="delAuthEmail()">Remove</button>
-          <br><br>
 
         <div class="custom-file mb-3">
           <label for="file" class="custom-file-label">Choose File<span class="required">*</span></label>
@@ -263,11 +259,13 @@
                 div.innerHTML = '<input type="text" name="auth['+count+']">';
                 document.getElementById('participant').appendChild(div);
                 count++;
+                addAuthEmail();
         }
         function delAuth(){
                 var select = document.getElementById('participant');
                 document.getElementById('participant').removeChild(select.lastChild);
                 count--;
+                delAuthEmail();
         }
         function addAuthEmail() {
                 var div = document.createElement('div');

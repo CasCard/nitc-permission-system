@@ -37,7 +37,7 @@ var rollno;
 var role;
 var studentEmail;
 var facultyEmail;
-var randomID = Math.floor(1000 + Math.random() * 9000);
+var randomID = Math.floor(100000 + Math.random() * 900000);
 var checkBoxStateFAC=false;
 var checkBoxStateSAC=false;
 var requestID;
