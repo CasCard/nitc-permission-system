@@ -25,8 +25,8 @@ const DataCollection = require('./models/request');
 
 // Mongo URI
 const mongoURI = "mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB";
-const appURI="https://nitc-permissions.herokuapp.com/";
-// const appURI="http://localhost:3000/";
+// const appURI="https://nitc-permissions.herokuapp.com/";
+const appURI="http://localhost:3000/";
 
 // Create mongo connection
 const conn = mongoose.createConnection(mongoURI, { useNewUrlParser: true,useUnifiedTopology: true });
@@ -332,11 +332,13 @@ app.route("/sac_verification")
     ID:req.body.id,
   },
   function(err, foundRequest){
-    console.log(foundRequest[0].from);
-    if(foundRequest){
+    if(foundRequest == undefined){
+      res.render("sac_verification");
+    }
+    else if(foundRequest){
     res.render("sac_verification",{data:foundRequest[0]});
     }else{
-      res.send(err);
+    res.send(err);
     }
   }
 );
