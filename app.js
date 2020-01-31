@@ -25,8 +25,8 @@ const DataCollection = require('./models/request');
 
 // Mongo URI
 const mongoURI = "mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB";
-const appURI="https://nitc-permissions.herokuapp.com/";
-// const appURI="http://localhost:3000/";
+// const appURI="https://nitc-permissions.herokuapp.com/";
+const appURI="http://localhost:3000/";
 
 // Create mongo connection
 const conn = mongoose.createConnection(mongoURI);
@@ -68,29 +68,53 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-const storage=new GridFsStorage({
-  url:mongoURI,
 
-  file:(req,file)=>{
-    return new Promise((resolve,reject)=>{
-      const filename=file.originalname;
-      const fileInfo={
-        filename:filename,
-        bucketName:'uploads'
-      };
-      resolve(fileInfo);
-    });
-  },
 
-});
+
+  const storage=new GridFsStorage({
+    url:mongoURI,
+
+    file:(req,file)=>{
+      return new Promise((resolve,reject)=>{
+        const filename=file.originalname;
+        const fileInfo={
+          filename:filename,
+          bucketName:'uploads'
+        };
+        resolve(fileInfo);
+
+      });
+    },
+
+  });
+
 
 var upload = multer({storage:storage});
 
-mongoose.connect(mongoURI, {
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-  autoIndex: false
-});
+
+
+const connect= async function(){
+  return mongoose.connect(mongoURI, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+    autoIndex: false
+  });
+};
+
+(async () => {
+  try {
+   const connected = await connect();
+  } catch(e) {
+   console.log('Error happend while connecting to the DB: ', e.message);
+  }
+})();
+
+
+// mongoose.connect(mongoURI, {
+//   useUnifiedTopology: true,
+//   useNewUrlParser: true,
+//   autoIndex: false
+// });
 mongoose.set("useCreateIndex", true);
 
 passport.use(User.createStrategy());
@@ -136,6 +160,8 @@ app.get("/",function(req, res) {
 });
 
 
+
+
 app.get("/auth/google",
   passport.authenticate('google', {
     scope: ["profile", "email"],
@@ -148,7 +174,7 @@ app.get("/auth/google/dashboard",
   passport.authenticate('google', {
     failureRedirect: "/login"
   }),
-  function(req, res) {
+   function(req, res) {
     console.log(studentEmail);
   if(studentEmail=='_'){
     res.redirect("/dashboard");
@@ -165,9 +191,10 @@ app.get("/login_failed", function(req, res) {
 });
 
 
-  app.get("/dashboard",function(req, res) {
+  app.get("/dashboard",async function(req, res,next) {
     console.log(req.user);
     if(req.user != undefined){
+      try{
     // "https://glacial-lake-64780.herokuapp.com/requests/B190257EP"
     gfs.files.find({}).toArray((err, files) => {
       // Check if files
@@ -208,8 +235,11 @@ app.get("/login_failed", function(req, res) {
 
       }
     });
-
-}else{
+}catch(err){
+  next(err);
+}
+}
+else{
   res.redirect('/');
 }
   });
@@ -364,7 +394,7 @@ app.route("/requests")
         purpose: req.body.purpose,
         from: req.body.from,
         ID:randomID,
-        rollno: req.body.rollno,
+        rollno: (req.body.rollno).toUpperCase(),
         date: req.body.date,
         to: req.body.auth,
         fac_email:req.body.email,
