@@ -29,7 +29,7 @@ const mongoURI = "mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongo
 const appURI="http://localhost:3000/";
 
 // Create mongo connection
-const conn = mongoose.createConnection(mongoURI);
+const conn = mongoose.createConnection(mongoURI, { useNewUrlParser: true,useUnifiedTopology: true });
 
 let gfs;
 var email;
@@ -117,6 +117,7 @@ const connect= async function(){
 // });
 mongoose.set("useCreateIndex", true);
 
+
 passport.use(User.createStrategy());
 passport.serializeUser(function(user, done) {
   done(null, user.id);
@@ -156,7 +157,11 @@ passport.use(new GoogleStrategy({
 
 
 app.get("/",function(req, res) {
+  if(req.user != undefined){
+    res.redirect('/dashboard');
+  }else{
     res.render('login');
+  }  
 });
 
 
