@@ -3,6 +3,7 @@
 
 <h1 style="text-align:center">Your recent requests</h1>
 <% for(let i = 0; i < posts.length; i++) { %>
+  <div class="article-content">
   <article>
     <button id = "btn1" type="button" style =  "width : 60%; margin-left : 20%;" class="collapsible"><h2> <i class="fas fa-bars"></i> <%= posts[i].purpose %></h2></button>
       <div type = "button" style= "width : 60%; margin-left : 20%" class="content">
@@ -35,6 +36,7 @@
         <% } %>
         <p>Verification by SAC is at the SAC office after Faculty Verification.</p>
   </article>
+  </div>
 <% } %>
  </div>
     <%# Addition 3 %>
