@@ -25,8 +25,8 @@ const DataCollection = require('./models/request');
 
 // Mongo URI
 const mongoURI = "mongodb+srv://abelcheruvathoor:abelcdixon@cluster0-mwzit.mongodb.net/wikiDB";
-const appURI="https://nitc-permissions.herokuapp.com/";
-// const appURI="http://localhost:3000/";
+// const appURI="https://nitc-permissions.herokuapp.com/";
+const appURI="http://localhost:3000/";
 
 // Create mongo connection
 const conn = mongoose.createConnection(mongoURI, { useNewUrlParser: true,useUnifiedTopology: true });
